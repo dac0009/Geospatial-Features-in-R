@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dom Cifelli">
+
+<title>Geospatial Features in R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="geospatial_files/libs/clipboard/clipboard.min.js"></script>
+<script src="geospatial_files/libs/quarto-html/quarto.js"></script>
+<script src="geospatial_files/libs/quarto-html/popper.min.js"></script>
+<script src="geospatial_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="geospatial_files/libs/quarto-html/anchor.min.js"></script>
+<link href="geospatial_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="geospatial_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="geospatial_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="geospatial_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="geospatial_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: #046A38;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: #046A38;
+background: #FAF8FD;
+      }
+</style>
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Geospatial Features in R</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Dom Cifelli </p>
+            </div>
+    </div>
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#geospatial-features-lidar-and-image-processing-in-r" id="toc-geospatial-features-lidar-and-image-processing-in-r" class="nav-link active" data-scroll-target="#geospatial-features-lidar-and-image-processing-in-r">Geospatial Features: LiDAR and Image Processing in R</a>
+  <ul class="collapse">
+  <li><a href="#goals" id="toc-goals" class="nav-link" data-scroll-target="#goals">Goals</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a>
+  <ul class="collapse">
+  <li><a href="#create-a-dtm" id="toc-create-a-dtm" class="nav-link" data-scroll-target="#create-a-dtm">Create a DTM</a></li>
+  <li><a href="#create-a-hillshade" id="toc-create-a-hillshade" class="nav-link" data-scroll-target="#create-a-hillshade">Create a Hillshade</a></li>
+  <li><a href="#create-a-ndsm" id="toc-create-a-ndsm" class="nav-link" data-scroll-target="#create-a-ndsm">Create a nDSM</a></li>
+  <li><a href="#calculate-point-cloud-statistics-in-cells" id="toc-calculate-point-cloud-statistics-in-cells" class="nav-link" data-scroll-target="#calculate-point-cloud-statistics-in-cells">Calculate Point Cloud Statistics in Cells</a></li>
+  <li><a href="#visualize-return-intensity" id="toc-visualize-return-intensity" class="nav-link" data-scroll-target="#visualize-return-intensity">Visualize Return Intensity</a></li>
+  <li><a href="#voxelize-point-cloud-data" id="toc-voxelize-point-cloud-data" class="nav-link" data-scroll-target="#voxelize-point-cloud-data">Voxelize Point Cloud Data</a></li>
+  </ul></li>
+  <li><a href="#image-processing" id="toc-image-processing" class="nav-link" data-scroll-target="#image-processing">Image Processing</a>
+  <ul class="collapse">
+  <li><a href="#normalized-difference-vegetation-index-ndvi" id="toc-normalized-difference-vegetation-index-ndvi" class="nav-link" data-scroll-target="#normalized-difference-vegetation-index-ndvi">Normalized Difference Vegetation Index (NDVI)</a></li>
+  <li><a href="#principal-component-analysis-pca" id="toc-principal-component-analysis-pca" class="nav-link" data-scroll-target="#principal-component-analysis-pca">Principal Component Analysis (PCA)</a></li>
+  <li><a href="#tasseled-cap-tranformation" id="toc-tasseled-cap-tranformation" class="nav-link" data-scroll-target="#tasseled-cap-tranformation">Tasseled Cap Tranformation</a></li>
+  <li><a href="#differenced-normalized-burn-ratio-dnbr" id="toc-differenced-normalized-burn-ratio-dnbr" class="nav-link" data-scroll-target="#differenced-normalized-burn-ratio-dnbr">Differenced Normalized Burn Ratio (dNBR)</a></li>
+  <li><a href="#moving-windows" id="toc-moving-windows" class="nav-link" data-scroll-target="#moving-windows">Moving Windows</a></li>
+  </ul></li>
+  <li><a href="#concluding-remarks" id="toc-concluding-remarks" class="nav-link" data-scroll-target="#concluding-remarks">Concluding Remarks</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="geospatial-features-lidar-and-image-processing-in-r" class="level1">
+<h1>Geospatial Features: LiDAR and Image Processing in R</h1>
+<section id="goals" class="level2">
+<h2 class="anchored" data-anchor-id="goals">Goals</h2>
+<ol type="1">
+<li><p>Manage large LiDAR datasets with LAS catalogs.</p></li>
+<li><p>Convert LiDAR data to raster grids for analysis.</p></li>
+<li><p>Extract indices from satellite image bands.</p></li>
+<li><p>Apply PCA and Tasseled Cap transformations to multispectral data.</p></li>
+<li><p>Assess environmental changes through date-based index comparisons.</p></li>
+<li><p>Implement moving windows for enhanced image analysis.</p></li>
+</ol>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>This project delves into the realm of LiDAR and image processing in R, utilizing the lidR package. The scope expands to encompass diverse raster data insights, with a primary focus on remotely sensed imagery. The objectives cover a spectrum of tasks, from efficiently handling LiDAR data to employing advanced techniques for comprehensive spatial analysis.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r a, comment="", collapse=TRUE, warning=FALSE, message=FALSE, results='hide'}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmap)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmaptools)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RStoolbox)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="create-a-dtm" class="level3">
+<h3 class="anchored" data-anchor-id="create-a-dtm">Create a DTM</h3>
+<p>Before we start, it’s important to note that the LiDAR data used in the examples are large files, typical for point cloud datasets. Executing the code may take some time, and results will be written to your hard drive. Feel free to read through the examples without running the code.</p>
+<p>The LiDAR data, obtained using the WV Elevation and LiDAR Download Tool, consists of six adjacent tiles. Instead of reading them separately, I’ll use a LAS catalog, allowing collective processing of multiple LAS files, akin to a LAS Dataset in ArcGIS. This approach demonstrates efficient handling of large volumes of LiDAR data.</p>
+<p>In the first example, I read all six LAS files from a folder using the <code>readLAScatalog()</code> function. Since the LiDAR data doesn’t include projection information, I manually define it using the <code>projection()</code> function. This step is data-dependent. The <code>summary()</code> function provides an overview of the catalog, including spatial extent, projection, area covered, point statistics, and the number of files. <code>lascheck()</code> assesses data issues, though the noted issues won’t impact our processing. It’s recommended to run this function after data are imported to check for any issues.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r b, message=FALSE}</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>las_cat <span class="ot">&lt;-</span> <span class="fu">readLAScatalog</span>(<span class="st">"lidar"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">projection</span>(las_cat) <span class="ot">&lt;-</span> <span class="st">"+proj=utm +zone=17 +ellps=GRS80 +datum=NAD83 +units=m +no_defs "</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(las_cat)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">las_check</span>(las_cat)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : LAScatalog (v1.4 format 6)
+extent      : 548590.2, 553090.2, 4183880, 4186880 (xmin, xmax, ymin, ymax)
+coord. ref. : unknown 
+area        : 13.5 km²
+points      : 69.34 million points
+density     : 5.1 points/m²
+density     : 3.9 pulses/m²
+num. files  : 6 
+proc. opt.  : buffer: 30 | chunk: 0
+input opt.  : select: * | filter: 
+output opt. : in memory | w2w guaranteed | merging enabled
+drivers     :
+ - Raster : format = GTiff  NAflag = -999999  
+ - stars : NA_value = -999999  
+ - SpatRaster : overwrite = FALSE  NAflag = -999999  
+ - SpatVector : overwrite = FALSE  
+ - LAS : no parameter
+ - Spatial : overwrite = FALSE  
+ - sf : quiet = TRUE  
+ - data.frame : no parameter
+
+ Checking headers consistency
+  - Checking file version consistency...[0;32m ✓[0m
+  - Checking scale consistency...[0;32m ✓[0m
+  - Checking offset consistency...[0;32m ✓[0m
+  - Checking point type consistency...[0;32m ✓[0m
+  - Checking VLR consistency...
+ [0;31m   ✗ Inconsistent number of VLR[0m
+  - Checking CRS consistency...[0;32m ✓[0m
+ Checking the headers
+  - Checking scale factor validity...[0;32m ✓[0m
+  - Checking Point Data Format ID validity...[0;32m ✓[0m
+ Checking preprocessing already done 
+  - Checking negative outliers...[0;32m ✓[0m
+  - Checking normalization...[0;31m no[0m
+ Checking the geometry
+  - Checking overlapping tiles...[0;32m ✓[0m
+  - Checking point indexation...[0;31m no[0m</code></pre>
+</div>
+</div>
+<p>Once you’ve defined processing options, you can conduct analyses and process the data. In this example, I’m generating a <strong>Digital Terrain Model (DTM)</strong> to portray ground elevations excluding above-ground features. A new processing option is set to specify where to store the resulting raster grids locally, labeled with the bottom-left coordinate of the extent. Within the <code>grid_terrain()</code> function, the output cell size is set to 2-by-2 meters. The k-nearest neighbor inverse distance weighting interpolation method is employed with 10 neighbors and a power of 2.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r c, message=FALSE}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_chunk_size</span>(las_cat) <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(las_cat, <span class="at">chunk_pattern =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_chunk_buffer</span>(las_cat) <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(las_cat, <span class="at">chunk_pattern =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(las_cat)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : LAScatalog (v1.4 format 6)
+extent      : 548590.2, 553090.2, 4183880, 4186880 (xmin, xmax, ymin, ymax)
+coord. ref. : unknown 
+area        : 13.5 km²
+points      : 69.34 million points
+density     : 5.1 points/m²
+density     : 3.9 pulses/m²
+num. files  : 6 
+proc. opt.  : buffer: 20 | chunk: 500
+input opt.  : select: * | filter: 
+output opt. : in memory | w2w guaranteed | merging enabled
+drivers     :
+ - Raster : format = GTiff  NAflag = -999999  
+ - stars : NA_value = -999999  
+ - SpatRaster : overwrite = FALSE  NAflag = -999999  
+ - SpatVector : overwrite = FALSE  
+ - LAS : no parameter
+ - Spatial : overwrite = FALSE  
+ - sf : quiet = TRUE  
+ - data.frame : no parameter</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/c-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/c-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r d, message=FALSE}</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(las_cat) <span class="ot">&lt;-</span> <span class="st">"las_out/dtm_{XLEFT}_{YBOTTOM}"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>dtm <span class="ot">&lt;-</span> <span class="fu">grid_terrain</span>(las_cat, <span class="at">res =</span> <span class="dv">2</span>, <span class="fu">knnidw</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">p =</span> <span class="dv">2</span>), <span class="at">keep_lowest =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Chunk 1 of 70 (1.4%): state ⚠
+Chunk 2 of 70 (2.9%): state ⚠
+Chunk 3 of 70 (4.3%): state ⚠
+Chunk 4 of 70 (5.7%): state ⚠
+Chunk 5 of 70 (7.1%): state ⚠
+Chunk 6 of 70 (8.6%): state ⚠
+Chunk 7 of 70 (10%): state ⚠
+Chunk 8 of 70 (11.4%): state ⚠
+Chunk 9 of 70 (12.9%): state ⚠
+Chunk 10 of 70 (14.3%): state ✓
+Chunk 11 of 70 (15.7%): state ⚠
+Chunk 12 of 70 (17.1%): state ⚠
+Chunk 13 of 70 (18.6%): state ⚠
+Chunk 14 of 70 (20%): state ⚠
+Chunk 15 of 70 (21.4%): state ⚠
+Chunk 16 of 70 (22.9%): state ⚠
+Chunk 17 of 70 (24.3%): state ⚠
+Chunk 18 of 70 (25.7%): state ⚠
+Chunk 19 of 70 (27.1%): state ⚠
+Chunk 20 of 70 (28.6%): state ⚠
+Chunk 21 of 70 (30%): state ⚠
+Chunk 22 of 70 (31.4%): state ⚠
+Chunk 23 of 70 (32.9%): state ⚠
+Chunk 24 of 70 (34.3%): state ⚠
+Chunk 25 of 70 (35.7%): state ⚠
+Chunk 26 of 70 (37.1%): state ⚠
+Chunk 27 of 70 (38.6%): state ⚠
+Chunk 28 of 70 (40%): state ⚠
+Chunk 29 of 70 (41.4%): state ⚠
+Chunk 30 of 70 (42.9%): state ⚠
+Chunk 31 of 70 (44.3%): state ⚠
+Chunk 32 of 70 (45.7%): state ⚠
+Chunk 33 of 70 (47.1%): state ⚠
+Chunk 34 of 70 (48.6%): state ⚠
+Chunk 35 of 70 (50%): state ⚠
+Chunk 36 of 70 (51.4%): state ⚠
+Chunk 37 of 70 (52.9%): state ⚠
+Chunk 38 of 70 (54.3%): state ⚠
+Chunk 39 of 70 (55.7%): state ⚠
+Chunk 40 of 70 (57.1%): state ⚠
+Chunk 41 of 70 (58.6%): state ⚠
+Chunk 42 of 70 (60%): state ⚠
+Chunk 43 of 70 (61.4%): state ⚠
+Chunk 44 of 70 (62.9%): state ⚠
+Chunk 45 of 70 (64.3%): state ⚠
+Chunk 46 of 70 (65.7%): state ⚠
+Chunk 47 of 70 (67.1%): state ⚠
+Chunk 48 of 70 (68.6%): state ⚠
+Chunk 49 of 70 (70%): state ⚠
+Chunk 50 of 70 (71.4%): state ⚠
+Chunk 51 of 70 (72.9%): state ⚠
+Chunk 52 of 70 (74.3%): state ⚠
+Chunk 53 of 70 (75.7%): state ⚠
+Chunk 54 of 70 (77.1%): state ⚠
+Chunk 55 of 70 (78.6%): state ⚠
+Chunk 56 of 70 (80%): state ⚠
+Chunk 57 of 70 (81.4%): state ⚠
+Chunk 58 of 70 (82.9%): state ⚠
+Chunk 59 of 70 (84.3%): state ⚠
+Chunk 60 of 70 (85.7%): state ⚠
+Chunk 61 of 70 (87.1%): state ⚠
+Chunk 62 of 70 (88.6%): state ⚠
+Chunk 63 of 70 (90%): state ⚠
+Chunk 64 of 70 (91.4%): state ⚠
+Chunk 65 of 70 (92.9%): state ⚠
+Chunk 66 of 70 (94.3%): state ⚠
+Chunk 67 of 70 (95.7%): state ⚠
+Chunk 68 of 70 (97.1%): state ⚠
+Chunk 69 of 70 (98.6%): state ⚠
+Chunk 70 of 70 (100%): state ⚠</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/d-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r e, message=FALSE}</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(dtm)<span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"quantile"</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"Greys"</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/e-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="create-a-hillshade" class="level3">
+<h3 class="anchored" data-anchor-id="create-a-hillshade">Create a Hillshade</h3>
+<p>A hillshade provides a visual representation of a terrain surface by simulating illumination from a specified position. In R, the process differs from ArcGIS. Initially, slope and aspect surfaces need to be generated, followed by using these surfaces to create a hillshade with a defined illuminating position. The necessary functions are provided by the raster package. In this example, the illuminating source is positioned in the northwest at a 45-degree angle above the horizon. The subsequent code block displays the hillshade using tmap.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>slope <span class="ot">&lt;-</span> <span class="fu">terrain</span>(dtm, <span class="at">opt=</span><span class="st">'slope'</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>aspect <span class="ot">&lt;-</span> <span class="fu">terrain</span>(dtm, <span class="at">opt=</span><span class="st">'aspect'</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>hs <span class="ot">&lt;-</span> <span class="fu">hillShade</span>(slope, aspect, <span class="at">angle=</span><span class="dv">45</span>, <span class="at">direction=</span><span class="dv">315</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(hs)<span class="sc">+</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"cont"</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"Greys"</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/h-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="create-a-ndsm" class="level3">
+<h3 class="anchored" data-anchor-id="create-a-ndsm">Create a nDSM</h3>
+<p>The <code>lasnorm()</code> function subtracts ground elevations from each point, requiring input LAS data and a DTM, and writes LAS files to disk. I’ve specified a new folder path to store the output. These normalized points enable the creation of a <strong>Canopy Height Model (CHM)</strong> or Normalized <strong>Digital Surface Model (nDSM)</strong>, where grid values represent heights above the ground.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r i, message=FALSE, results='hide'}</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(las_cat) <span class="ot">&lt;-</span> <span class="st">"las_out/norm/norm_{XLEFT}_{YBOTTOM}"</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>lasnorm <span class="ot">&lt;-</span> <span class="fu">normalize_height</span>(las_cat, dtm)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/i-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Next, the <code>grid_canopy()</code> function generates a <strong>Digital Surface Model (DSM)</strong>. If normalized data are provided, the result is a CHM or nDSM. In this instance, I’m using the original point cloud data without normalization. After generating the surface, it can be saved to a permanent file. The pitfree algorithm is applied to produce a smoothed model or remove pits.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r j, message=FALSE}</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(las_cat) <span class="ot">&lt;-</span> <span class="st">"las_out/dsm/dsm_{XLEFT}_{YBOTTOM}"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>dsm <span class="ot">&lt;-</span> <span class="fu">grid_canopy</span>(las_cat, <span class="at">res =</span> <span class="dv">2</span>, <span class="fu">pitfree</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>,<span class="dv">15</span>), <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)))</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Chunk 1 of 70 (1.4%): state ✓
+Chunk 2 of 70 (2.9%): state ✓
+Chunk 3 of 70 (4.3%): state ✓
+Chunk 4 of 70 (5.7%): state ✓
+Chunk 5 of 70 (7.1%): state ✓
+Chunk 6 of 70 (8.6%): state ✓
+Chunk 7 of 70 (10%): state ✓
+Chunk 8 of 70 (11.4%): state ✓
+Chunk 9 of 70 (12.9%): state ✓
+Chunk 10 of 70 (14.3%): state ✓
+Chunk 11 of 70 (15.7%): state ✓
+Chunk 12 of 70 (17.1%): state ✓
+Chunk 13 of 70 (18.6%): state ✓
+Chunk 14 of 70 (20%): state ✓
+Chunk 15 of 70 (21.4%): state ✓
+Chunk 16 of 70 (22.9%): state ✓
+Chunk 17 of 70 (24.3%): state ✓
+Chunk 18 of 70 (25.7%): state ✓
+Chunk 19 of 70 (27.1%): state ✓
+Chunk 20 of 70 (28.6%): state ✓
+Chunk 21 of 70 (30%): state ✓
+Chunk 22 of 70 (31.4%): state ✓
+Chunk 23 of 70 (32.9%): state ✓
+Chunk 24 of 70 (34.3%): state ✓
+Chunk 25 of 70 (35.7%): state ✓
+Chunk 26 of 70 (37.1%): state ✓
+Chunk 27 of 70 (38.6%): state ✓
+Chunk 28 of 70 (40%): state ✓
+Chunk 29 of 70 (41.4%): state ✓
+Chunk 30 of 70 (42.9%): state ✓
+Chunk 31 of 70 (44.3%): state ✓
+Chunk 32 of 70 (45.7%): state ✓
+Chunk 33 of 70 (47.1%): state ✓
+Chunk 34 of 70 (48.6%): state ✓
+Chunk 35 of 70 (50%): state ✓
+Chunk 36 of 70 (51.4%): state ✓
+Chunk 37 of 70 (52.9%): state ✓
+Chunk 38 of 70 (54.3%): state ✓
+Chunk 39 of 70 (55.7%): state ✓
+Chunk 40 of 70 (57.1%): state ✓
+Chunk 41 of 70 (58.6%): state ✓
+Chunk 42 of 70 (60%): state ✓
+Chunk 43 of 70 (61.4%): state ✓
+Chunk 44 of 70 (62.9%): state ✓
+Chunk 45 of 70 (64.3%): state ✓
+Chunk 46 of 70 (65.7%): state ✓
+Chunk 47 of 70 (67.1%): state ✓
+Chunk 48 of 70 (68.6%): state ✓
+Chunk 49 of 70 (70%): state ✓
+Chunk 50 of 70 (71.4%): state ✓
+Chunk 51 of 70 (72.9%): state ✓
+Chunk 52 of 70 (74.3%): state ✓
+Chunk 53 of 70 (75.7%): state ✓
+Chunk 54 of 70 (77.1%): state ✓
+Chunk 55 of 70 (78.6%): state ✓
+Chunk 56 of 70 (80%): state ✓
+Chunk 57 of 70 (81.4%): state ✓
+Chunk 58 of 70 (82.9%): state ✓
+Chunk 59 of 70 (84.3%): state ✓
+Chunk 60 of 70 (85.7%): state ✓
+Chunk 61 of 70 (87.1%): state ✓
+Chunk 62 of 70 (88.6%): state ✓
+Chunk 63 of 70 (90%): state ✓
+Chunk 64 of 70 (91.4%): state ✓
+Chunk 65 of 70 (92.9%): state ✓
+Chunk 66 of 70 (94.3%): state ✓
+Chunk 67 of 70 (95.7%): state ✓
+Chunk 68 of 70 (97.1%): state ✓
+Chunk 69 of 70 (98.6%): state ✓
+Chunk 70 of 70 (100%): state ✓</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/j-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r l, message=FALSE}</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>ndsm <span class="ot">&lt;-</span> dsm <span class="sc">-</span> dtm</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>ndsm[ndsm<span class="sc">&lt;</span><span class="dv">0</span>]<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>ndsm</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>class      : RasterLayer 
+dimensions : 1501, 2251, 3378751  (nrow, ncol, ncell)
+resolution : 2, 2  (x, y)
+extent     : 548590, 553092, 4183878, 4186880  (xmin, xmax, ymin, ymax)
+crs        : +proj=utm +zone=17 +datum=NAD83 +units=m +no_defs 
+source     : memory
+names      : layer 
+values     : 0, 175.455  (min, max)</code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r m, message=FALSE, results='hide'}</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ndsm)<span class="sc">+</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"quantile"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"Greens"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/m-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="calculate-point-cloud-statistics-in-cells" class="level3">
+<h3 class="anchored" data-anchor-id="calculate-point-cloud-statistics-in-cells">Calculate Point Cloud Statistics in Cells</h3>
+<p>The <code>grid_metrics()</code> function allows the calculation of statistics from point data within each grid cell. In this example, I compute the mean elevation from the first return data within 10-by-10 meter cells. Beforehand, I set a filter option to consider only the first returns. The results are then displayed using tmap.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r n, message=FALSE}</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(las_cat) <span class="ot">&lt;-</span> <span class="st">"las_out/means/means_{XLEFT}_{YBOTTOM}"</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(las_cat) <span class="ot">&lt;-</span> <span class="st">"-keep_first"</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>metrics <span class="ot">&lt;-</span> <span class="fu">grid_metrics</span>(las_cat, <span class="sc">~</span><span class="fu">mean</span>(Z), <span class="dv">10</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Chunk 1 of 70 (1.4%): state ✓
+Chunk 2 of 70 (2.9%): state ✓
+Chunk 3 of 70 (4.3%): state ✓
+Chunk 4 of 70 (5.7%): state ✓
+Chunk 5 of 70 (7.1%): state ✓
+Chunk 6 of 70 (8.6%): state ✓
+Chunk 7 of 70 (10%): state ✓
+Chunk 8 of 70 (11.4%): state ✓
+Chunk 9 of 70 (12.9%): state ✓
+Chunk 10 of 70 (14.3%): state ✓
+Chunk 11 of 70 (15.7%): state ✓
+Chunk 12 of 70 (17.1%): state ✓
+Chunk 13 of 70 (18.6%): state ✓
+Chunk 14 of 70 (20%): state ✓
+Chunk 15 of 70 (21.4%): state ✓
+Chunk 16 of 70 (22.9%): state ✓
+Chunk 17 of 70 (24.3%): state ✓
+Chunk 18 of 70 (25.7%): state ✓
+Chunk 19 of 70 (27.1%): state ✓
+Chunk 20 of 70 (28.6%): state ✓
+Chunk 21 of 70 (30%): state ✓
+Chunk 22 of 70 (31.4%): state ✓
+Chunk 23 of 70 (32.9%): state ✓
+Chunk 24 of 70 (34.3%): state ✓
+Chunk 25 of 70 (35.7%): state ✓
+Chunk 26 of 70 (37.1%): state ✓
+Chunk 27 of 70 (38.6%): state ✓
+Chunk 28 of 70 (40%): state ✓
+Chunk 29 of 70 (41.4%): state ✓
+Chunk 30 of 70 (42.9%): state ✓
+Chunk 31 of 70 (44.3%): state ✓
+Chunk 32 of 70 (45.7%): state ✓
+Chunk 33 of 70 (47.1%): state ✓
+Chunk 34 of 70 (48.6%): state ✓
+Chunk 35 of 70 (50%): state ✓
+Chunk 36 of 70 (51.4%): state ✓
+Chunk 37 of 70 (52.9%): state ✓
+Chunk 38 of 70 (54.3%): state ✓
+Chunk 39 of 70 (55.7%): state ✓
+Chunk 40 of 70 (57.1%): state ✓
+Chunk 41 of 70 (58.6%): state ✓
+Chunk 42 of 70 (60%): state ✓
+Chunk 43 of 70 (61.4%): state ✓
+Chunk 44 of 70 (62.9%): state ✓
+Chunk 45 of 70 (64.3%): state ✓
+Chunk 46 of 70 (65.7%): state ✓
+Chunk 47 of 70 (67.1%): state ✓
+Chunk 48 of 70 (68.6%): state ✓
+Chunk 49 of 70 (70%): state ✓
+Chunk 50 of 70 (71.4%): state ✓
+Chunk 51 of 70 (72.9%): state ✓
+Chunk 52 of 70 (74.3%): state ✓
+Chunk 53 of 70 (75.7%): state ✓
+Chunk 54 of 70 (77.1%): state ✓
+Chunk 55 of 70 (78.6%): state ✓
+Chunk 56 of 70 (80%): state ✓
+Chunk 57 of 70 (81.4%): state ✓
+Chunk 58 of 70 (82.9%): state ✓
+Chunk 59 of 70 (84.3%): state ✓
+Chunk 60 of 70 (85.7%): state ✓
+Chunk 61 of 70 (87.1%): state ✓
+Chunk 62 of 70 (88.6%): state ✓
+Chunk 63 of 70 (90%): state ✓
+Chunk 64 of 70 (91.4%): state ✓
+Chunk 65 of 70 (92.9%): state ✓
+Chunk 66 of 70 (94.3%): state ✓
+Chunk 67 of 70 (95.7%): state ✓
+Chunk 68 of 70 (97.1%): state ✓
+Chunk 69 of 70 (98.6%): state ✓
+Chunk 70 of 70 (100%): state ✓</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/n-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r o, message=FALSE}</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>metrics[metrics<span class="sc">&lt;</span><span class="dv">0</span>]<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(metrics)<span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"quantile"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"Greens"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/o-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="visualize-return-intensity" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-return-intensity">Visualize Return Intensity</h3>
+<p>In addition to elevation measurements, LiDAR data can store return intensity information, representing the proportion of emitted energy associated with each return from laser pulses. The following code blocks visualize intensity values, showcasing the mean first return intensity within 5-by-5 meter cells. This visualization offers valuable insights into the LiDAR data.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r p, message=FALSE, results='hide'}</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(las_cat) <span class="ot">&lt;-</span> <span class="st">"las_out/int/int_{XLEFT}_{YBOTTOM}"</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(las_cat) <span class="ot">&lt;-</span> <span class="st">"-keep_first"</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>int <span class="ot">&lt;-</span> <span class="fu">grid_metrics</span>(las_cat, <span class="sc">~</span><span class="fu">mean</span>(Intensity), <span class="dv">5</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/p-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r q, message=FALSE}</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>int[int<span class="sc">&lt;</span><span class="dv">0</span>]<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(int)<span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"quantile"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"-Greys"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/q-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="voxelize-point-cloud-data" class="level3">
+<h3 class="anchored" data-anchor-id="voxelize-point-cloud-data">Voxelize Point Cloud Data</h3>
+<p>In this final LiDAR example, a single LAS file is read in. A <strong>Digital Terrain Model (DTM)</strong> is generated from the point cloud, followed by normalizing the data using the DTM. Subsequently, voxels are generated from the data, where each voxel represents a 3D cube rather than a traditional 2D grid cell. In this instance, a voxel is created with dimensions of 5 meters in all three dimensions, storing the standard deviation of the normalized height measurements from the returns within it.</p>
+<p>Voxels play a crucial role in analyzing 3D point clouds, offering a valuable tool, for instance, in exploring the 3D structure of forests.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r r, message=FALSE, results='hide'}</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>las1 <span class="ot">&lt;-</span> <span class="fu">readLAS</span>(<span class="st">"lidar/CO195.las"</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>las1_dtm <span class="ot">&lt;-</span> <span class="fu">grid_terrain</span>(las1, <span class="at">res =</span> <span class="dv">2</span>, <span class="fu">knnidw</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">p =</span> <span class="dv">2</span>), <span class="at">keep_lowest =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>las1_n <span class="ot">&lt;-</span> <span class="fu">normalize_height</span>(las1, las1_dtm)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>las1_vox <span class="ot">&lt;-</span> <span class="fu">grid_metrics</span>(las1_n, <span class="sc">~</span><span class="fu">sd</span>(Z), <span class="at">res =</span> <span class="dv">5</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="image-processing" class="level2">
+<h2 class="anchored" data-anchor-id="image-processing">Image Processing</h2>
+<section id="normalized-difference-vegetation-index-ndvi" class="level3">
+<h3 class="anchored" data-anchor-id="normalized-difference-vegetation-index-ndvi">Normalized Difference Vegetation Index (NDVI)</h3>
+<p>Let’s delve into methods for processing remotely sensed imagery. Our first step is to calculate the <strong>Normalized Difference Vegetation Index (NDVI)</strong> from Landsat 8 <strong>Operational Land Imager (OLI)</strong> data. NDVI is computed by subtracting the <strong>Near-Infrared (NIR)</strong> and red channels, then dividing by their sum. In this case, Band 5 corresponds to NIR, and Band 4 corresponds to red. The following code block performs this calculation and visualizes the result using tmap.</p>
+<p>Dark green areas on the plot signify vegetated regions like forests and fields, while lighter areas indicate non-vegetated areas or areas with stressed or unhealthy vegetation.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r s, message=FALSE}</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co">#You must set your own working directory.</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>ls8 <span class="ot">&lt;-</span> <span class="fu">brick</span>(<span class="st">"lidar/ls8example.tif"</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRGB</span>(ls8, <span class="at">r=</span><span class="dv">5</span>, <span class="at">g=</span><span class="dv">4</span>, <span class="at">b=</span><span class="dv">3</span>, <span class="at">stretch=</span><span class="st">"lin"</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/s-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r t, message=FALSE}</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#You must set your own working directory.</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>ndvi <span class="ot">&lt;-</span> (ls8<span class="sc">$</span>Layer_5<span class="sc">-</span>ls8<span class="sc">$</span>Layer_4)<span class="sc">/</span>((ls8<span class="sc">$</span>Layer_5<span class="sc">+</span>ls8<span class="sc">$</span>Layer_4)<span class="sc">+</span>.<span class="dv">001</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ndvi)<span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"quantile"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"Greens"</span>, <span class="at">n =</span> <span class="dv">7</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/t-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="principal-component-analysis-pca" class="level3">
+<h3 class="anchored" data-anchor-id="principal-component-analysis-pca">Principal Component Analysis (PCA)</h3>
+<p>You can create principal component bands from a raw image using the <code>rasterPCA()</code> function from the <code>RSToolbox()</code> package. <strong>Principal Component Analysis (PCA)</strong> is employed to derive new, uncorrelated data from correlated data. Assuming variability in data represents information, PCA becomes a useful tool for capturing information content in fewer variables. When applied to imagery, it can generate uncorrelated bands from raw imagery, potentially reducing the number of bands needed to represent the information.</p>
+<p>In this example, PCA is applied to all bands in the Landsat 8 image. The function generates a list object containing the new image and information about the PCA analysis. I extract the resulting raster bands and display the first three principal components as a false-color image.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r u, message=FALSE}</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Check and handle missing values for PCA </span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ls8 <span class="ot">&lt;-</span> <span class="fu">stack</span>(<span class="st">"lidar/ls8example.tif"</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>ls8 <span class="ot">&lt;-</span> <span class="fu">calc</span>(ls8, <span class="cf">function</span>(x) <span class="fu">ifelse</span>(<span class="fu">is.finite</span>(x), x, <span class="cn">NA</span>))</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r asdf, message=FALSE}</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>ls8_pca <span class="ot">&lt;-</span> <span class="fu">rasterPCA</span>(ls8, <span class="at">nSamples =</span> <span class="cn">NULL</span>, <span class="at">nComp =</span> <span class="fu">nlayers</span>(ls8), <span class="at">spca =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+|---------|---------|---------|---------|
+=========================================
+                                          </code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r v, message=FALSE}</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>ls8_pca_img <span class="ot">&lt;-</span> <span class="fu">stack</span>(ls8_pca<span class="sc">$</span>map)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRGB</span>(ls8_pca_img, <span class="at">r=</span><span class="dv">1</span>, <span class="at">b=</span><span class="dv">2</span>, <span class="at">g=</span><span class="dv">3</span>, <span class="at">stretch=</span><span class="st">"lin"</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/v-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r w, message=FALSE}</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>ls8_pca<span class="sc">$</span>model</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+princomp(cor = spca, covmat = covMat)
+
+Standard deviations:
+    Comp.1     Comp.2     Comp.3     Comp.4     Comp.5     Comp.6     Comp.7 
+24.1772296 11.0168152  4.2179996  1.1382589  0.9980586  0.5632723  0.3406967 
+
+ 7  variables and  3666706 observations.</code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r xxx, message=FALSE}</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>ls8_pca<span class="sc">$</span>model<span class="sc">$</span>loadings</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Loadings:
+        Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6 Comp.7
+layer.1         0.263  0.354  0.121  0.574  0.285  0.615
+layer.2         0.319  0.410  0.116  0.372        -0.758
+layer.3  0.104  0.287  0.390  0.124 -0.242 -0.796  0.215
+layer.4  0.126  0.392  0.325        -0.671  0.522       
+layer.5  0.790 -0.529  0.290 -0.101                     
+layer.6  0.512  0.360 -0.544  0.559                     
+layer.7  0.285  0.429 -0.264 -0.795  0.150 -0.104       
+
+               Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6 Comp.7
+SS loadings     1.000  1.000  1.000  1.000  1.000  1.000  1.000
+Proportion Var  0.143  0.143  0.143  0.143  0.143  0.143  0.143
+Cumulative Var  0.143  0.286  0.429  0.571  0.714  0.857  1.000</code></pre>
+</div>
+</div>
+</section>
+<section id="tasseled-cap-tranformation" class="level3">
+<h3 class="anchored" data-anchor-id="tasseled-cap-tranformation">Tasseled Cap Tranformation</h3>
+<p>The Tasseled Cap transformation, akin to PCA, utilizes predefined values to generate brightness, greenness, and wetness bands from original spectral bands. Distinct coefficients are employed for various sensors, including Landsat <strong>Thematic Mapper (TM)</strong>, Enhanced <strong>Thematic Mapper Plus (ETM+)</strong>, and <strong>Operational Land Imager (OLI)</strong> data. In this instance, Landsat 7 ETM+ data is brought in using the <code>brick()</code> function.</p>
+<p>The two images depict a section of the Black Hills of South Dakota before and after a fire event.</p>
+<p>Upon reading the data, I rename the bands and apply defined coefficients to each band for the transformation. The results are summed to yield the transformation.</p>
+<p>In the subsequent code, I stack the brightness, greenness, and wetness bands and visualize them as a false-color composite. The impact of the fire is evident in the resulting image.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r xyz, message=FALSE}</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>pre <span class="ot">&lt;-</span> <span class="fu">brick</span>(<span class="st">"lidar/pre_ref.img"</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>post <span class="ot">&lt;-</span> <span class="fu">brick</span>(<span class="st">"lidar/post_ref.img"</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRGB</span>(pre, <span class="at">r=</span><span class="dv">6</span>, <span class="at">g=</span><span class="dv">4</span>, <span class="at">b=</span><span class="dv">2</span>, <span class="at">stretch=</span><span class="st">"lin"</span>)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRGB</span>(post, <span class="at">r=</span><span class="dv">6</span>, <span class="at">g=</span><span class="dv">4</span>, <span class="at">b=</span><span class="dv">2</span>, <span class="at">stretch=</span><span class="st">"lin"</span>)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/xyz-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/xyz-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Once the data are read in, I rename the bands then apply the defined coefficients to each band for each transformation. I add the results to obtain the transformation.</p>
+<p>In the next set of code, I stack the brightness, greenness, and wetness bands then display them as a false color composite. In the result, the extent of the fire is obvious.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r yy, message=FALSE}</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pre) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Blue"</span>, <span class="st">"Green"</span>, <span class="st">"Red"</span>, <span class="st">"NIR"</span>, <span class="st">"SWIR1"</span>, <span class="st">"SWIR2"</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(post) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Blue"</span>, <span class="st">"Green"</span>, <span class="st">"Red"</span>, <span class="st">"NIR"</span>, <span class="st">"SWIR1"</span>, <span class="st">"SWIR2"</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>pre_brightness <span class="ot">&lt;-</span> (pre<span class="sc">$</span>Blue<span class="sc">*</span>.<span class="dv">3561</span>) <span class="sc">+</span> (pre<span class="sc">$</span>Green<span class="sc">*</span>.<span class="dv">3972</span>) <span class="sc">+</span> (pre<span class="sc">$</span>Red<span class="sc">*</span>.<span class="dv">3904</span>) <span class="sc">+</span> (pre<span class="sc">$</span>NIR<span class="sc">*</span>.<span class="dv">6966</span>) <span class="sc">+</span> (pre<span class="sc">$</span>SWIR1<span class="sc">*</span>.<span class="dv">2286</span>) <span class="sc">+</span> (pre<span class="sc">$</span>SWIR2<span class="sc">*</span>.<span class="dv">1596</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>pre_greenness <span class="ot">&lt;-</span> (pre<span class="sc">$</span>Blue<span class="sc">*-</span>.<span class="dv">3344</span>) <span class="sc">+</span> (pre<span class="sc">$</span>Green<span class="sc">*-</span>.<span class="dv">3544</span>) <span class="sc">+</span> (pre<span class="sc">$</span>Red<span class="sc">*-</span>.<span class="dv">4556</span>) <span class="sc">+</span> (pre<span class="sc">$</span>NIR<span class="sc">*</span>.<span class="dv">6966</span>) <span class="sc">+</span> (pre<span class="sc">$</span>SWIR1<span class="sc">*-</span>.<span class="dv">0242</span>) <span class="sc">+</span> (pre<span class="sc">$</span>SWIR2<span class="sc">*-</span>.<span class="dv">2630</span>)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>pre_wetness <span class="ot">&lt;-</span> (pre<span class="sc">$</span>Blue<span class="sc">*</span>.<span class="dv">2626</span>) <span class="sc">+</span> (pre<span class="sc">$</span>Green<span class="sc">*</span>.<span class="dv">2141</span>) <span class="sc">+</span> (pre<span class="sc">$</span>Red<span class="sc">*</span>.<span class="dv">0926</span>) <span class="sc">+</span> (pre<span class="sc">$</span>NIR<span class="sc">*</span>.<span class="dv">0656</span>) <span class="sc">+</span> (pre<span class="sc">$</span>SWIR1<span class="sc">*-</span>.<span class="dv">7629</span>) <span class="sc">+</span> (pre<span class="sc">$</span>SWIR2<span class="sc">*-</span>.<span class="dv">5388</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>post_brightness <span class="ot">&lt;-</span> (post<span class="sc">$</span>Blue<span class="sc">*</span>.<span class="dv">3561</span>) <span class="sc">+</span> (post<span class="sc">$</span>Green<span class="sc">*</span>.<span class="dv">3972</span>) <span class="sc">+</span> (post<span class="sc">$</span>Red<span class="sc">*</span>.<span class="dv">3904</span>) <span class="sc">+</span> (post<span class="sc">$</span>NIR<span class="sc">*</span>.<span class="dv">6966</span>) <span class="sc">+</span> (post<span class="sc">$</span>SWIR1<span class="sc">*</span>.<span class="dv">2286</span>) <span class="sc">+</span> (post<span class="sc">$</span>SWIR2<span class="sc">*</span>.<span class="dv">1596</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>post_greenness <span class="ot">&lt;-</span> (post<span class="sc">$</span>Blue<span class="sc">*-</span>.<span class="dv">3344</span>) <span class="sc">+</span> (post<span class="sc">$</span>Green<span class="sc">*-</span>.<span class="dv">3544</span>) <span class="sc">+</span> (post<span class="sc">$</span>Red<span class="sc">*-</span>.<span class="dv">4556</span>) <span class="sc">+</span> (post<span class="sc">$</span>NIR<span class="sc">*</span>.<span class="dv">6966</span>) <span class="sc">+</span> (post<span class="sc">$</span>SWIR1<span class="sc">*-</span>.<span class="dv">0242</span>) <span class="sc">+</span> (post<span class="sc">$</span>SWIR2<span class="sc">*-</span>.<span class="dv">2630</span>)</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>post_wetness <span class="ot">&lt;-</span> (post<span class="sc">$</span>Blue<span class="sc">*</span>.<span class="dv">2626</span>) <span class="sc">+</span> (post<span class="sc">$</span>Green<span class="sc">*</span>.<span class="dv">2141</span>) <span class="sc">+</span> (post<span class="sc">$</span>Red<span class="sc">*</span>.<span class="dv">0926</span>) <span class="sc">+</span> (post<span class="sc">$</span>NIR<span class="sc">*</span>.<span class="dv">0656</span>) <span class="sc">+</span> (post<span class="sc">$</span>SWIR1<span class="sc">*-</span>.<span class="dv">7629</span>) <span class="sc">+</span> (post<span class="sc">$</span>SWIR2<span class="sc">*-</span>.<span class="dv">5388</span>)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r zab, message=FALSE}</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>pre_tc <span class="ot">&lt;-</span> <span class="fu">stack</span>(pre_brightness, pre_greenness, pre_wetness)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>post_tc <span class="ot">&lt;-</span> <span class="fu">stack</span>(post_brightness, post_greenness, post_wetness)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRGB</span>(pre_tc, <span class="at">r=</span><span class="dv">3</span>, <span class="at">g=</span><span class="dv">2</span>, <span class="at">b=</span><span class="dv">1</span>, <span class="at">stretch=</span><span class="st">"lin"</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRGB</span>(post_tc, <span class="at">r=</span><span class="dv">3</span>, <span class="at">g=</span><span class="dv">2</span>, <span class="at">b=</span><span class="dv">1</span>, <span class="at">stretch=</span><span class="st">"lin"</span>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/zab-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/zab-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="differenced-normalized-burn-ratio-dnbr" class="level3">
+<h3 class="anchored" data-anchor-id="differenced-normalized-burn-ratio-dnbr">Differenced Normalized Burn Ratio (dNBR)</h3>
+<p>To further investigate the extent of the fire, I will use the <strong>differenced Normalized Burn Ratio (dNBR)</strong>, obtained from the SWIR and NIR bands. A burned area typically exhibits high SWIR reflectance and low NIR reflectance compared to a forested area. By calculating this index before and after a fire event, I can map the extent and severity of the fire. The following code illustrates this result, where high values in the dNBR output indicate burned areas.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r aa, message=FALSE}</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>pre_nbr <span class="ot">&lt;-</span> (pre<span class="sc">$</span>NIR <span class="sc">-</span> pre<span class="sc">$</span>SWIR2)<span class="sc">/</span>((pre<span class="sc">$</span>NIR <span class="sc">+</span> pre<span class="sc">$</span>SWIR2)<span class="sc">+</span>.<span class="dv">0001</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>post_nbr <span class="ot">&lt;-</span> (post<span class="sc">$</span>NIR <span class="sc">-</span> post<span class="sc">$</span>SWIR2)<span class="sc">/</span>((post<span class="sc">$</span>NIR <span class="sc">+</span> post<span class="sc">$</span>SWIR2)<span class="sc">+</span>.<span class="dv">0001</span>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>dnbr <span class="ot">&lt;-</span> pre_nbr <span class="sc">-</span> post_nbr</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>dnbr[dnbr <span class="sc">&lt;=</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(dnbr)<span class="sc">+</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"equal"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"YlOrRd"</span>, <span class="at">n =</span> <span class="dv">7</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/aa-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="moving-windows" class="level3">
+<h3 class="anchored" data-anchor-id="moving-windows">Moving Windows</h3>
+<p>Analyzing local patterns in image data is commonly achieved by applying moving windows or kernels over the image to transform or summarize pixel values. In R, this can be done using the <code>focal()</code> function from the raster package.</p>
+<p>In the initial example, I calculate the average NDVI value in 5-by-5 cell windows. This involves generating a kernel using the <code>matrix()</code> function. Specifically, I create a kernel with dimensions of 5-by-5 values, totaling 25 cells. Each cell is filled with 1/25. Passing this over the grid will calculate the mean in each window.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>ndvi5 <span class="ot">&lt;-</span> <span class="fu">focal</span>(ndvi, <span class="at">w=</span><span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">25</span>,<span class="at">nrow=</span><span class="dv">5</span>,<span class="at">ncol=</span><span class="dv">5</span>)) </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ndvi5)<span class="sc">+</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"quantile"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"Greens"</span>, <span class="at">n =</span> <span class="dv">7</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/bb-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>gx <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="sc">-</span><span class="dv">4</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="sc">-</span><span class="dv">2</span>) </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>gy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="sc">-</span><span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>gx_m <span class="ot">&lt;-</span> <span class="fu">matrix</span>(gx, <span class="at">nrow=</span><span class="dv">5</span>, <span class="at">ncol=</span><span class="dv">5</span>, <span class="at">byrow=</span><span class="cn">TRUE</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>gx_m</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>] [,<span class="dv">3</span>] [,<span class="dv">4</span>] [,<span class="dv">5</span>]</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,]    <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">4</span>    <span class="dv">2</span>    <span class="dv">2</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>[<span class="dv">2</span>,]    <span class="dv">1</span>    <span class="dv">1</span>    <span class="dv">2</span>    <span class="dv">1</span>    <span class="dv">1</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>[<span class="dv">3</span>,]    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">0</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>,]   <span class="sc">-</span><span class="dv">1</span>   <span class="sc">-</span><span class="dv">1</span>   <span class="sc">-</span><span class="dv">2</span>   <span class="sc">-</span><span class="dv">1</span>   <span class="sc">-</span><span class="dv">1</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>[<span class="dv">5</span>,]   <span class="sc">-</span><span class="dv">1</span>   <span class="sc">-</span><span class="dv">2</span>   <span class="sc">-</span><span class="dv">4</span>   <span class="sc">-</span><span class="dv">2</span>   <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>gy_m <span class="ot">&lt;-</span> <span class="fu">matrix</span>(gy, <span class="at">nrow=</span><span class="dv">5</span>, <span class="at">ncol=</span><span class="dv">5</span>, <span class="at">byrow=</span><span class="cn">TRUE</span>)</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>gy_m</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>     [,<span class="dv">1</span>] [,<span class="dv">2</span>] [,<span class="dv">3</span>] [,<span class="dv">4</span>] [,<span class="dv">5</span>]</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,]    <span class="dv">2</span>    <span class="dv">1</span>    <span class="dv">0</span>   <span class="sc">-</span><span class="dv">1</span>   <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>[<span class="dv">2</span>,]    <span class="dv">2</span>    <span class="dv">1</span>    <span class="dv">0</span>   <span class="sc">-</span><span class="dv">1</span>   <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>[<span class="dv">3</span>,]    <span class="dv">4</span>    <span class="dv">2</span>    <span class="dv">0</span>   <span class="sc">-</span><span class="dv">2</span>   <span class="sc">-</span><span class="dv">4</span></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>,]    <span class="dv">2</span>    <span class="dv">1</span>    <span class="dv">0</span>   <span class="sc">-</span><span class="dv">1</span>   <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>[<span class="dv">5</span>,]    <span class="dv">2</span>    <span class="dv">1</span>    <span class="dv">0</span>   <span class="sc">-</span><span class="dv">1</span>   <span class="sc">-</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>ndvi_edgex <span class="ot">&lt;-</span> <span class="fu">focal</span>(ndvi, <span class="at">w=</span>gx_m)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>ndvi_edgey <span class="ot">&lt;-</span> <span class="fu">focal</span>(ndvi, <span class="at">w=</span>gy_m) </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ndvi_edgex)<span class="sc">+</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"quantile"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"-Greys"</span>, <span class="at">n =</span> <span class="dv">7</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/dd-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ndvi_edgey)<span class="sc">+</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_raster</span>(<span class="at">style=</span> <span class="st">"quantile"</span>, <span class="at">n=</span><span class="dv">7</span>, <span class="at">palette=</span><span class="fu">get_brewer_pal</span>(<span class="st">"-Greys"</span>, <span class="at">n =</span> <span class="dv">7</span>, <span class="at">plot=</span><span class="cn">FALSE</span>))<span class="sc">+</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="geospatial_files/figure-html/dd-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="concluding-remarks" class="level2">
+<h2 class="anchored" data-anchor-id="concluding-remarks">Concluding Remarks</h2>
+<p>For further exploration of raster and image analysis techniques, refer to the documentation for the raster and RStoolbox packages. Additionally, consider using terra for analyses on multispectral image data.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
